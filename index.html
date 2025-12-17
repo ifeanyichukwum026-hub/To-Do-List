@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo ListApp</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <style>
+        body{
+            margin: auto;
+            padding: 0;
+            box-shadow: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url(to\ do\ list.jpg) no-repeat center;
+            background-size: cover;
+        }
+        .container{
+            background-color: darkgray;
+            width: 500px;
+            padding: 20px 10px;
+            border-radius: 10px;
+
+
+        }
+        .input-box{
+            display: flex;
+            background-color: white;
+            padding: 10px 10px;
+            border-radius: 7px;
+        }
+        .text{
+            display: block;
+            flex: 5;
+            width: 100px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            border: 1px solid black;
+            padding-left: 10px;
+            border-radius: 7px;
+            
+        }
+        .input-error{
+            border: 2px solid red;
+            outline: none;
+
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px);}
+            75% { transform: translateX(-5px);}
+            100% { transform: translateX(0);}
+        }
+        .shake{
+            animation: shake 0.3s;
+        }
+        .input-btn{
+            flex: 1;
+            margin-left: 10px;
+            border-radius: 8px;
+            border: 2px solid;
+        }
+        .input-btn:hover{
+            background-color: darkslategrey;
+        }
+        .task{
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .check-btn{
+            background-color: darkcyan;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border-width: 1px;
+        }
+        .del-btn{
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border-width: 1px;
+            
+        }
+        .task li{
+            flex: 4;
+            list-style: none;
+        }
+
+        .task li:nth-child(odd) {
+            background-color: grey;
+            color: black;
+            padding: 5px 10px;
+        }
+
+        .task li:nth-child(even) {
+            background-color: black;
+            color: white;
+            padding: 5px 10px;
+        }
+        .error{
+            color: red;
+            font-size: 17px;
+            font-weight: bold;
+            display: none;
+            padding: 0;
+            margin: 0;
+        }
+        .task-container{
+            margin: 0;
+            padding: 0;
+        }
+        /* Task container */
+.task-container {
+  margin-top: 15px;
+}
+
+/* Each task card */
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f4f4f4;
+  border-left: 6px solid #4caf50;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.task:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Task text */
+.task li {
+  flex: 4;
+  list-style: none;
+  font-size: 16px;
+  color: #222;
+}
+
+/* Completed task */
+.task li.done {
+  text-decoration: line-through;
+  color: gray;
+  opacity: 0.7;
+}
+
+/* Alternate colors for tasks */
+.task:nth-child(odd) {
+  border-left-color: #2196f3; /* blue */
+  background: #e3f2fd;
+}
+
+.task:nth-child(even) {
+  border-left-color: #ff9800; /* orange */
+  background: #fff3e0;
+}
+
+/* Buttons */
+.check-btn,
+.del-btn {
+  border: none;
+  padding: 6px 10px;
+  margin-left: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Check & Edit button */
+.check-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.check-btn:hover {
+  background: #388e3c;
+}
+
+/* Delete button */
+.del-btn {
+  background: #f44336;
+  color: white;
+}
+
+.del-btn:hover {
+  background: #c62828;
+}
+.task li.done {
+  color: green;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="error">Please Enter Task</p>
+        <div class="input-box">
+            <input type="text" class="text" placeholder="Enter task">
+            <button class="input-btn">+</button>
+        </div>
+        <div class="task-container"></div>
+    </div>
+    <script>
+        let inputBtn = document.querySelector(".input-btn");
+let text = document.querySelector(".text");
+let taskContainer = document.querySelector(".task-container");
+let error = document.querySelector(".error");
+
+/* ---------- SAVE TASKS ---------- */
+function saveTasks() {
+  let tasks = [];
+  document.querySelectorAll(".task li").forEach(li => {
+    tasks.push({
+      text: li.textContent,
+      done: li.classList.contains("done")
+    });
+  });
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+/* ---------- CREATE TASK ---------- */
+function createTask(taskText, completed = false) {
+  let task = document.createElement("div");
+  task.classList.add("task");
+
+  let li = document.createElement("li");
+  li.textContent = taskText;
+
+  if (completed) {
+    li.classList.add("done");
+    li.style.textDecoration = "line-through";
+  }
+
+  /* Check button */
+  let checkButton = document.createElement("button");
+  checkButton.innerHTML = '<ion-icon name="checkmark-sharp"></ion-icon>';
+  checkButton.classList.add("check-btn");
+  checkButton.onclick = () => {
+    li.classList.toggle("done");
+    li.style.textDecoration =
+      li.classList.contains("done") ? "line-through" : "none";
+    saveTasks();
+  };
+
+  /* Edit button */
+  let editButton = document.createElement("button");
+  editButton.innerHTML = '<ion-icon name="create-sharp"></ion-icon>';
+  editButton.classList.add("check-btn");
+  editButton.onclick = () => {
+    let newText = prompt("Edit task:", li.textContent);
+    if (newText !== null && newText.trim() !== "") {
+      li.textContent = newText;
+      saveTasks();
+    }
+  };
+
+  /* Delete button */
+  let delButton = document.createElement("button");
+  delButton.innerHTML = '<ion-icon name="trash-sharp"></ion-icon>';
+  delButton.classList.add("del-btn");
+  delButton.onclick = () => {
+    task.remove();
+    saveTasks();
+  };
+
+  task.append(li, checkButton, editButton, delButton);
+  taskContainer.appendChild(task);
+  saveTasks();
+}
+
+/* ---------- ADD TASK ---------- */
+function addTask() {
+  if (text.value.trim() === "") {
+    error.style.display = "block";
+    text.classList.add("input-error", "shake");
+    setTimeout(() => text.classList.remove("shake"), 300);
+    return;
+  }
+
+  error.style.display = "none";
+  text.classList.remove("input-error");
+
+  createTask(text.value);
+  text.value = "";
+}
+
+/* ---------- LOAD SAVED TASKS ---------- */
+window.onload = () => {
+  let savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  savedTasks.forEach(task => {
+    createTask(task.text, task.done);
+  });
+};
+
+/* ---------- EVENTS ---------- */
+inputBtn.addEventListener("click", addTask);
+
+text.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addTask();
+  }
+});
+
+text.addEventListener("input", () => {
+  error.style.display = "none";
+  text.classList.remove("input-error");
+});
+    </script>
+</body>
+</html>
